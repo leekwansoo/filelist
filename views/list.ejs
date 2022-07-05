@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    
+    <title>File List</title>
+  </head>
+  <body>
+
+   <%- include('nav.html') %>
+     <!-- 
+    //서버의 할일 리스트 -->
+    <div class="container mt-5">
+    <h3 class="text-center">File 리스트 </h3>
+    <div class="container input-group mb-2">
+      <input class="form-control" id="search-input">
+      <button class="input-group-append btn btn-danger" id="search">검색</button>
+    </div>
+    <ul class = "list-group">
+      <% for (var i = 0; i < filelists.length; i ++) { %>
+        <li class="list-group-item">
+          <h5>Title<a href="/detail.html?id="<%= filelists[i]._id %>"><%= filelists[i].title %></a></h5>
+          <p> Category : <%= filelists[i].cat %> </p> 
+          <p> id 값 : <%= filelists[i].id %> </p> 
+          <p> url : <a href="<%= filelists[i].url %>"><%= filelists[i].url %></a></p> 
+          <button class="btn btn-danger delete" id="<%= filelists[i]._id %>">삭제</button>
+          <button class="btn btn-danger edit" id="<%= filelists[i]._id %>">수정</button>
+        </li>
+      <% } %>
+    </ul>
+    </div>
+
+    <script>
+     
+    $('.delete').click(function(e){
+      console.log(e.target.id)
+      $.ajax({
+        method : 'DELETE',
+        url : '/delete',
+        data : { _id : e.target.id }
+      }).done((결과)=>{
+       $(this).parent('li').remove();
+   
+        })
+      });
+
+      $('.edit').click(function(e){
+        console.log(e.target.id)
+        $.ajax({
+          method : 'GET',
+          url : '/edit',
+          data : { _id : e.target.id }
+          
+        }).done((결과)=>{
+          console.log(결과)
+          })
+      });
+
+      $('#search').click(function(){
+      
+        var 입력한값 = $('#search-input').val();
+        
+        window.location.replace('/search?value=' + 입력한값)
+      });
+
+</script>
+        
+   
+  </body>
+</html>
