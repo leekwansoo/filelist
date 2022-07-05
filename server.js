@@ -49,7 +49,7 @@ app.get('/list', function(요청, 응답){
 app.get('/filelist', function(요청, 응답){
   db.collection('filelist').find().toArray(function(에러,결과){
       console.log(결과);
-      응답.render('list1.ejs', {filelists: 결과});
+      응답.render('filelist.ejs', {filelists: 결과});
   });
 });
 
