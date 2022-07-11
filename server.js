@@ -1,6 +1,33 @@
 const express = require('express');
+const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+var storage = multer.diskStorage({
+  destination : function(req, file, cb){
+    cb(null, './public/image')
+  },
+  filename : function(req, file, cb){
+    cb(null, file.originalname)
+  }
+});
+
+var upload = multer({
+  storage: storage,
+  fileFilter: function (req, file, callback) {
+      var ext = path.extname(file.originalname);
+      if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+          return callback(new Error('PNG, JPG만 업로드하세요'))
+      }
+      callback(null, true)
+  },
+  limits:{
+      fileSize: 1024 * 1024
+  }
+});
 
 const app = express();
+app.use(express.json());
+app.use(cors());
 const bodyParser= require('body-parser') ;
 app.use(bodyParser.urlencoded({extended: true})) ;
 const MongoClient = require('mongodb').MongoClient;
@@ -28,10 +55,23 @@ app.get('/', function(요청,응답){
     응답.render('index.ejs')
 });
 
+app.get('/image/:imageName', function(요청, 응답){
+  응답.sendFile( __dirname + '/public/image/' + 요청.params.imageName )
+})
+
+app.get('/upload', function(요청,응답){
+  응답.render('upload.ejs')
+});
+
+app.post('/upload', upload.single('profile'), function(요청, 응답){
+  console.log(요청.body);
+  응답.send('uploading finished')
+});
+
 app.get('/write', function (요청, 응답) {
   console.log(요청.user);
 응답.render('write.ejs')
-})
+});
 
 app.get('/addlist', function (요청, 응답) {
   console.log(요청.user);
@@ -52,6 +92,30 @@ app.get('/filelist', function(요청, 응답){
       응답.render('list1.ejs', {filelists: 결과});
   });
 });
+
+app.get('/music', function(요청, 응답){
+  db.collection('filelist').find().toArray(function(에러,결과){
+      console.log(결과);
+      응답.json(결과)});
+  });
+
+  app.get('/movie', function(요청, 응답){
+    db.collection('filelist').find().toArray(function(에러,결과){
+        console.log(결과);
+        응답.json(결과)});
+  });
+
+  app.get('/document', function(요청, 응답){
+    db.collection('filelist').find().toArray(function(에러,결과){
+        console.log(결과);
+        응답.json(결과)});
+  });
+
+  app.get('/picture', function(요청, 응답){
+    db.collection('filelist').find().toArray(function(에러,결과){
+        console.log(결과);
+        응답.json(결과)});
+  });
 
 app.get('/detail/:id', function(요청,응답) {
     db.collection('post').findOne({_id: parseInt(요청.params.id)}, function(에러,결과){응답.render('detail.ejs', {data: 결과})
